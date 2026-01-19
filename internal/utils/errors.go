@@ -2,7 +2,7 @@ package utils
 
 import (
 	"fmt"
-	"log"
+	"os"
 
 	"github.com/fatih/color"
 )
@@ -10,7 +10,10 @@ import (
 // HandleError 处理错误，输出到日志和控制台
 func HandleError(err error, context string) {
 	if err != nil {
-		log.Printf("[ERROR] %s: %v", context, err)
+		GetLogger().zLogger.Error().
+			Err(err).
+			Str("context", context).
+			Msg("发生错误")
 		color.Red("❌ %s: %v\n", context, err)
 	}
 }
@@ -18,9 +21,12 @@ func HandleError(err error, context string) {
 // HandleErrorWithExit 处理错误并退出程序
 func HandleErrorWithExit(err error, context string) {
 	if err != nil {
-		log.Printf("[FATAL] %s: %v", context, err)
+		GetLogger().zLogger.Fatal().
+			Err(err).
+			Str("context", context).
+			Msg("致命错误")
 		color.Red("❌ %s: %v\n", context, err)
-		// 这里可以根据需要决定是否退出
+		os.Exit(1)
 	}
 }
 
@@ -41,7 +47,9 @@ func MustFatal(err error, context string) {
 // Errorf 格式化错误并处理
 func Errorf(format string, args ...interface{}) error {
 	err := fmt.Errorf(format, args...)
-	log.Printf("[ERROR] %v", err)
+	GetLogger().zLogger.Error().
+		Err(err).
+		Msg("格式化错误")
 	color.Red("❌ %v\n", err)
 	return err
 }
